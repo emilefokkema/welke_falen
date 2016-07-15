@@ -239,6 +239,151 @@
 				function(div){
 					win.document.body.appendChild(div);
 				});
+
+			//the regex-maker
+			(function(body, d){
+				var resultaat1, resultaat2, inputRij;
+				var nieuwe=function(kleur){
+					var i=d.createElement('input');
+					i.setAttribute('type','text');
+					if(kleur){i.style.backgroundColor=kleur;}
+					return i;
+				};
+				var uitvoerVeld=function(){
+					var div=d.createElement('div');
+					var veld=nieuwe();
+					veld.setAttribute('style', 'width:500px');
+					veld.onmouseup=function(e){e.preventDefault();veld.select();};
+					div.appendChild(veld);
+					var zet=function(tekst){
+						veld.value=tekst;
+					};
+					var input=function(){return veld;};
+					return {node:div,zet:zet, input: input};
+				};
+				var regesc=function(s){return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');};
+				var zetDingen=(function(){
+					var taken=[];
+					var zet=function(){
+						for(var i=0;i<taken.length;i++){
+							taken[i]();
+						}
+					};
+					zet.add=function(f){taken.push(f);};
+					return zet;
+				})();
+				var div=d.createElement('div');
+				div.setAttribute('style', 'position:fixed;left:0px;bottom:0px');
+				inputRij=(function(){
+					var div=d.createElement('div');
+					var nodeRij1=d.createElement('div');
+					var nodeRij2=d.createElement('div');
+					nodeRij2.setAttribute('style','position:relative');
+					var rij=[];
+					var vervangerRij=[];
+					var grens;
+					var maakGrens=function(g){
+						grens=g;
+						for(var i=0;i<rij.length;i++){
+							if(i<grens){
+								rij[i].style.backgroundColor='#FFFFFF';
+							}else{
+								rij[i].style.backgroundColor='#DDDDDD';
+							}
+						}
+					};
+					var regex=function(){
+						var s=[];
+						var ds;
+						for(var i=0;i<grens;i++){
+							ds=regesc(rij[i].value.trim());
+							s.push("\\s*?)("+(ds?ds:".*?")+")(\\s*?");
+							
+						}
+						return "(\\|"+s.join('\\|')+"\\|)";
+					};
+					var replacerText=function(){
+						var r="";
+						var dr, value;
+						for(var i=0;i<2*grens+1;i++){
+							dr="\\"+(i+1).toString();
+							if(i%2==1){
+								value=vervangerRij[(i-1)/2].value;
+								dr=value?value:dr;
+							}
+							r+=dr;
+						}
+						return r;
+					};
+					zetDingen.add(function(){if(resultaat1){resultaat1.zet(regex());}});
+					zetDingen.add(function(){if(resultaat2){resultaat2.zet(replacerText());}});
+					var maakNieuwe=function(){
+						var n=nieuwe();
+						n.onkeyup=zetDingen;
+						n.onclick=(function(index){
+							return function(e){
+								if(e.ctrlKey){
+									maakGrens(index);
+								}else{
+
+								}
+							};
+						})(rij.length);
+						for(var i=0;i<rij.length;i++){
+						 	rij[i].onfocus=function(){};
+						}
+						n.onfocus=maakNieuwe;
+
+						rij.push(n);
+						nodeRij1.appendChild(n);
+						var vervanger=nieuwe();
+						vervanger.onkeyup=zetDingen;
+						vervangerRij.push(vervanger);
+						nodeRij2.appendChild(vervanger);
+
+						if(resultaat2){resultaat2.zet(replacerText())}
+						zetDingen();
+						maakGrens(rij.length-1);
+					};
+					var maakLeeg=function(){
+						for(var i=0;i<rij.length;i++){
+							rij[i].value="";
+						}
+					};
+					var zetReeks=function(arr){
+						var plaats=-1;
+						maakLeeg();
+						for(var i=0;i<arr.length;i++){
+							if(arr[i]&&arr[i].length>0){
+								plaats+=1;
+								if(rij.length<plaats+2){maakNieuwe();}
+								rij[plaats].value=arr[i];
+							}
+						}
+					};
+					maakNieuwe();
+					zetDingen();
+					div.appendChild(nodeRij1);
+					div.appendChild(nodeRij2);
+					return {node:div, zetReeks:zetReeks};
+				})();
+				div.appendChild(inputRij.node);
+				resultaat1=uitvoerVeld();
+				resultaat1.input().onblur=function(){
+					var value=resultaat1.input().value;
+					value=value?value.trim():value;
+					if(value&&value[0]=="|"){
+						var reeks=value.split(/\|/g);
+						inputRij.zetReeks(reeks);
+						zetDingen();
+					}
+				};
+				div.appendChild(resultaat1.node);
+
+				resultaat2=uitvoerVeld();
+				div.appendChild(resultaat2.node);
+				body.appendChild(div);
+			})(win.document.body, document);
 		};
 		getTestHistoryLinks(open);
 	})(
