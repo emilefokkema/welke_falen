@@ -1,6 +1,6 @@
 {
-	"name":"Page Redder",
-	"description":"Make the current page red",
+	"name":"Welke Falen",
+	"description":"laat zien welke falen",
 	"version":"2.0",
 	"permissions":[
 		"activeTab",
@@ -14,7 +14,7 @@
 		"persistent":false
 	},
 	"browser_action":{
-		"default_title":"Make this page red"
+		"default_title":"laat zien welke falen"
 	},
 	"manifest_version":2
 }
