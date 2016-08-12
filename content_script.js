@@ -114,7 +114,7 @@
 										return function(){
 											textarea.focus();
 											highlightOn(index);
-											win.open('http://localhost/'+path);
+											win.open('http://localhost/'+path+'?edit');
 										}
 									})(this.text, rowIndex);
 									aHistory.onclick=(function(path, index){
