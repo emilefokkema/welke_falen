@@ -16,5 +16,8 @@
 	"browser_action":{
 		"default_title":"laat zien welke falen"
 	},
-	"manifest_version":2
+	"manifest_version":2,
+	"icons":{
+		"48":"icon.png"
+	}
 }
