@@ -117,13 +117,16 @@
 											win.open('http://localhost/'+path+'?edit');
 										}
 									})(this.text, rowIndex);
-									aHistory.onclick=(function(path, index){
-										return function(){
-											textarea.focus();
-											highlightOn(index);
-											win.open(path);
-										}
-									})(testHistoryLinks.filter(function(entry){return self.text.endsWith(entry.name);})[0].testHistoryLink, rowIndex);
+									var historyLinkEntries = testHistoryLinks.filter(function(entry){return self.text.endsWith(entry.name);});
+									if(historyLinkEntries.length >= 1){
+										aHistory.onclick=(function(path, index){
+											return function(){
+												textarea.focus();
+												highlightOn(index);
+												win.open(path);
+											}
+										})(historyLinkEntries[0].testHistoryLink, rowIndex);
+									}
 									a3.onclick=(function(href, index){
 										return function(){
 											textarea.focus();
